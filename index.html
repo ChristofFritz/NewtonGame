@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Newton Game</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  Fire: Space &nbsp;|&nbsp; Click target: auto-aim &nbsp;|&nbsp; R: new map &nbsp;|&nbsp; G: ghost
+</div>
+<div id="solver"></div>
+<div id="panel">
+  <div class="row" id="angleRow">
+    <label>Angle</label>
+    <input id="angle" type="text" value="45.000">
+    <span style="width:14px;text-align:center">°</span>
+    <label id="ghostLabel"><input type="checkbox" id="showGhost" checked> ghost</label>
+  </div>
+  <div class="row" id="speedRow">
+    <label>Speed</label>
+    <input id="speed" type="text" value="300.000">
+    <button id="fire">FIRE</button>
+    <input type="color" id="trailColor" title="Trail colour">
+  </div>
+</div>
+
+<!-- classic scripts (not ES modules) so the game works from file:// -->
+<!-- order matters: shared top-level consts/lets flow top to bottom -->
+<script src="js/config.js"></script>
+<script src="js/canvas.js"></script>
+<script src="js/state.js"></script>
+<script src="js/physics.js"></script>
+<script src="js/world.js"></script>
+<script src="js/firing.js"></script>
+<script src="js/ghost.js"></script>
+<script src="js/solver.js"></script>
+<script src="js/panel.js"></script>
+<script src="js/render.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
