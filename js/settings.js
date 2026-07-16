@@ -48,6 +48,8 @@ resetBtn.addEventListener('click', () => {
   // also reset the other persisted preferences
   localStorage.removeItem('trailColor');
   setTrailColor('#7fb4e8');
+  localStorage.removeItem('solverMode');
+  solverModeSel.value = 'scenic';
   if (!ghostCheckbox.checked) {
     ghostCheckbox.checked = true;
     ghostCheckbox.dispatchEvent(new Event('change'));

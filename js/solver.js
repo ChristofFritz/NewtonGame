@@ -13,13 +13,16 @@ function simulateShot(angDeg, spd, h, maxT, tgt, rec) {
     vy: dy * spd,
   };
   let minDist = Math.hypot(tgt.x - b.x, tgt.y - b.y);
+  let pathLen = 0;
   const steps = Math.floor(maxT / h);
   for (let i = 0; i < steps; i++) {
+    const px = b.x, py = b.y;
     integrate(b, h);
+    pathLen += Math.hypot(b.x - px, b.y - py);
     if (rec && i % 4 === 0) rec.push({ x: b.x, y: b.y });
     const d = Math.hypot(tgt.x - b.x, tgt.y - b.y);
     if (d < minDist) minDist = d;
-    if (d < tgt.r + 1.5) return { hit: true, minDist: d, t: (i + 1) * h };
+    if (d < tgt.r + 1.5) return { hit: true, minDist: d, t: (i + 1) * h, len: pathLen };
     if (hitsPlanet(b.x, b.y)) break;
     const ot = hitTarget(b.x, b.y);
     if (ot && ot !== tgt) break;
@@ -31,6 +34,20 @@ function simulateShot(angDeg, spd, h, maxT, tgt, rec) {
 let solver = null;
 let solvedMsg = null;
 
+// how to choose among all candidate shots that hit the target
+const solverModeSel = document.getElementById('solverMode');
+solverModeSel.value = localStorage.getItem('solverMode') || 'scenic';
+if (!solverModeSel.value) solverModeSel.value = 'scenic'; // stored value no longer exists
+solverModeSel.addEventListener('change', () => localStorage.setItem('solverMode', solverModeSel.value));
+
+const HIT_PICKERS = {
+  scenic:   hits => hits.reduce((w, c) => (c.sp < w.sp || (c.sp === w.sp && c.t > w.t)) ? c : w),
+  longest:  hits => hits.reduce((w, c) => c.len > w.len ? c : w),
+  shortest: hits => hits.reduce((w, c) => c.len < w.len ? c : w),
+  quickest: hits => hits.reduce((w, c) => c.t < w.t ? c : w),
+  random:   hits => hits[Math.floor(rand(0, hits.length))],
+};
+
 function startSolver(tgt) {
   const candidates = [];
   for (let a = 0; a < 360; a += 2) {
@@ -38,9 +55,10 @@ function startSolver(tgt) {
   }
   solver = {
     tgt, candidates, i: 0, best: null, hit: false,
+    mode: HIT_PICKERS[solverModeSel.value] ? solverModeSel.value : 'scenic',
     phase: 'coarse', da: 1.5, ds: 45, evals: 0,
     sims: 0, t0: performance.now(),
-    hits: [],      // all coarse candidates that hit — scenic one wins
+    hits: [],      // all coarse candidates that hit — mode picks the winner
     viz: [],       // recently simulated candidate paths, drawn faint
   };
   solvedMsg = null;
@@ -83,15 +101,14 @@ function runSolver(deadline) {
       const r = simulateShot(a, sp, 1 / 90, 8, s.tgt, rec);
       s.sims++;
       if (rec && rec.length > 1) pushViz(s, rec, false);
-      if (r.hit) s.hits.push({ a, sp, minDist: r.minDist, t: r.t });
+      if (r.hit) s.hits.push({ a, sp, minDist: r.minDist, t: r.t, len: r.len });
       if (!s.best || r.minDist < s.best.minDist) s.best = { a, sp, minDist: r.minDist };
     }
     if (s.i >= s.candidates.length) {
-      // scenic pick: among all hitting shots, slowest launch wins
-      // (gravity-dominated = curvy); tie-break on longest flight time
+      // among all hitting shots the selected mode picks the winner
+      // (scenic = slowest launch = gravity-dominated and curvy)
       if (s.hits.length > 0) {
-        s.hits.sort((p, q) => p.sp - q.sp || q.t - p.t);
-        const w = s.hits[0];
+        const w = HIT_PICKERS[s.mode](s.hits);
         s.best = { a: w.a, sp: w.sp, minDist: w.minDist };
       }
       // re-evaluate the coarse winner with the exact integrator
@@ -141,7 +158,7 @@ function updateSolverBox() {
       : `REFINING  ±${s.da.toFixed(4)}° ±${s.ds.toFixed(2)}v`;
     solverBox.style.display = 'block';
     solverBox.textContent =
-      `${spin} ORBITAL SOLVER  ${phase}\n`
+      `${spin} ORBITAL SOLVER [${s.mode}]  ${phase}\n`
       + (s.best
         ? `best Δ ${s.best.minDist.toFixed(2)}px  θ ${s.best.a.toFixed(3)}°  v ${s.best.sp.toFixed(3)}\n`
         : `scanning…\n`)

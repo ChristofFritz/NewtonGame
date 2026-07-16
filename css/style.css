@@ -78,6 +78,16 @@ canvas { display: block; cursor: crosshair; }
 }
 #ghostLabel input { width: auto; margin: 0; }
 
+#solverModeLabel {
+  margin-left: 16px; width: auto;
+  display: flex; align-items: center; gap: 6px;
+}
+#solverModeLabel select {
+  background: #0c0d12; color: #e5e7eb;
+  border: 1px solid #23262f; border-radius: 3px;
+  font: inherit; padding: 2px 4px;
+}
+
 #solver {
   position: fixed; top: 12px; right: 14px;
   font-family: ui-monospace, Menlo, monospace; font-size: 12px;
