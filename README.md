@@ -4,6 +4,8 @@ A small orbital-mechanics shooter on an HTML canvas. Static planets bend
 your projectiles' paths with inverse-square gravity; thread shots through
 the gravity field to hit targets, which explode into shards.
 
+Inspired by [NewtonWars](https://github.com/Draradech/NewtonWars).
+
 ## Play
 
 Open `index.html` in a browser. No build, no dependencies.
