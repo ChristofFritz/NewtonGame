@@ -4,8 +4,8 @@ const angleInput = document.getElementById('angle');
 const speedInput = document.getElementById('speed');
 
 function syncInputs() {
-  angleInput.value = angle.toFixed(3);
-  speedInput.value = speed.toFixed(3);
+  angleInput.value = angle.toFixed(4);
+  speedInput.value = speed.toFixed(4);
   invalidateGhost();
 }
 syncInputs();
