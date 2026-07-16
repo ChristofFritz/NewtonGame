@@ -17,7 +17,7 @@ canvas { display: block; cursor: crosshair; }
   display: flex; flex-direction: column; gap: 8px;
   user-select: none;
 }
-.row { display: flex; align-items: center; gap: 4px; }
+.row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .row label { width: 52px; }
 .row input {
   width: 110px; text-align: right;
