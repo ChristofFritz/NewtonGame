@@ -28,7 +28,7 @@ function spawnProjectile(x, y, vx, vy, small) {
   projectiles.push({
     x, y, vx, vy,
     age: 0,
-    lifetime: small ? 10 : PROJ_LIFETIME,
+    lifetime: small ? SHARD_LIFETIME : PROJ_LIFETIME,
     small: !!small,
     trail,
   });
@@ -46,10 +46,10 @@ function fire() {
 }
 
 function explodeTarget(t) {
-  const n = Math.floor(rand(3, 7)); // 3-6 shards
+  const n = Math.floor(rand(SHARDS_MIN, SHARDS_MAX + 1));
   for (let i = 0; i < n; i++) {
     const a = rand(0, Math.PI * 2);
-    const v = rand(60, 180);
+    const v = rand(SHARD_V_MIN, SHARD_V_MAX);
     spawnProjectile(
       t.x + Math.cos(a) * (t.r + 2),
       t.y + Math.sin(a) * (t.r + 2),

@@ -16,7 +16,7 @@ function pressable(b, apply) {
   const stop = () => { clearInterval(timer); timer = null; };
   b.addEventListener('pointerdown', () => {
     apply();
-    timer = setInterval(() => { apply(); fire(); }, 200);
+    timer = setInterval(() => { apply(); fire(); }, SWEEP_MS);
   });
   b.addEventListener('pointerup', stop);
   b.addEventListener('pointerleave', stop);

@@ -5,11 +5,11 @@ function generateWorld() {
   projectiles = [];
   trails = [];
   targets = [];
-  const count = Math.floor(rand(10, 16));
+  const count = Math.floor(rand(PLANETS_MIN, PLANETS_MAX + 1));
   let attempts = 0;
   while (planets.length < count && attempts < 500) {
     attempts++;
-    const r = rand(16, 46);
+    const r = rand(PLANET_R_MIN, PLANET_R_MAX);
     const p = {
       x: rand(r + 25, W - r - 25),
       y: rand(r + 25, H - r - 25),
@@ -32,8 +32,7 @@ function generateWorld() {
   }
 
   // targets: away from planets, player and each other
-  const targetCount = 6;
-  for (let i = 0; i < 500 && targets.length < targetCount; i++) {
+  for (let i = 0; i < 2000 && targets.length < TARGET_COUNT; i++) {
     const x = rand(30, W - 30);
     const y = rand(30, H - 30);
     if (planets.some(q => Math.hypot(q.x - x, q.y - y) < q.r + 30)) continue;

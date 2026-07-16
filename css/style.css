@@ -45,6 +45,32 @@ canvas { display: block; cursor: crosshair; }
   background: none; cursor: pointer; margin-left: 16px;
 }
 
+#settingsToggle { min-width: 32px; margin-left: 8px; }
+
+#settings {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 6px 18px;
+  padding-top: 8px; border-top: 1px solid #23262f;
+}
+#settings .cfg {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; cursor: pointer;
+}
+#settings .cfg input {
+  width: 64px; text-align: right;
+  background: #0c0d12; color: #e5e7eb;
+  border: 1px solid #23262f; border-radius: 3px;
+  font: inherit; padding: 2px 5px;
+}
+#resetConfig {
+  background: #16181f; color: #9ca3af;
+  border: 1px solid #3a3f4b; border-radius: 3px;
+  font: inherit; font-size: 11px;
+  padding: 3px 8px; cursor: pointer;
+  margin-left: auto;
+}
+#resetConfig:hover { background: #1f2229; color: #e5e7eb; }
+
 #ghostLabel {
   margin-left: 16px; width: auto;
   display: flex; align-items: center; gap: 5px;
