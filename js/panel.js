@@ -4,8 +4,8 @@ const angleInput = document.getElementById('angle');
 const speedInput = document.getElementById('speed');
 
 function syncInputs() {
-  angleInput.value = angle.toFixed(6);
-  speedInput.value = speed.toFixed(6);
+  angleInput.value = angle.toFixed(7);
+  speedInput.value = speed.toFixed(7);
   invalidateGhost();
 }
 syncInputs();
@@ -23,18 +23,23 @@ function pressable(b, apply) {
   b.addEventListener('pointercancel', stop);
 }
 
+// avoid "1e-7"-style labels on the small increments
+function fmtInc(inc) {
+  return inc >= 1 ? String(inc) : inc.toFixed(7).replace(/0+$/, '');
+}
+
 function makeButtons(row, apply) {
   const input = row.querySelector('input');
   for (const inc of [...INCREMENTS].reverse()) {
     const b = document.createElement('button');
-    b.textContent = '-' + inc;
+    b.textContent = '-' + fmtInc(inc);
     pressable(b, () => apply(-inc));
     row.insertBefore(b, input);
   }
   const anchor = input.nextSibling;
   for (const inc of INCREMENTS) {
     const b = document.createElement('button');
-    b.textContent = '+' + inc;
+    b.textContent = '+' + fmtInc(inc);
     pressable(b, () => apply(inc));
     row.insertBefore(b, anchor);
   }

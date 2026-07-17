@@ -50,8 +50,8 @@ const HIT_PICKERS = {
 
 function startSolver(tgt) {
   const candidates = [];
-  for (let a = 0; a < 360; a += 2) {
-    for (let s = 40; s <= SPEED_MAX; s += 40) candidates.push([a, s]);
+  for (let a = 0; a < 360; a += 1.5) {
+    for (let s = 30; s <= SPEED_MAX; s += 30) candidates.push([a, s]);
   }
   solver = {
     tgt, candidates, i: 0, best: null, hit: false,
@@ -123,7 +123,7 @@ function runSolver(deadline) {
 
   // refine: hill-climb on closest approach with the exact integrator
   while (performance.now() < deadline) {
-    if (s.hit || s.da < 0.002 || s.evals > 400) { finishSolver(); return; }
+    if (s.hit || s.da < 0.00005 || s.evals > 1500) { finishSolver(); return; }
     let improved = false;
     for (const [na, ns] of NEIGHBORS) {
       const a = wrapAngle(s.best.a + na * s.da);
