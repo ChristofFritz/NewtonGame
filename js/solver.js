@@ -14,15 +14,23 @@ function simulateShot(angDeg, spd, h, maxT, tgt, rec) {
   };
   let minDist = Math.hypot(tgt.x - b.x, tgt.y - b.y);
   let pathLen = 0;
+  let sling = 0, zone = -1; // count entries into a planet's flyby zone
   const steps = Math.floor(maxT / h);
   for (let i = 0; i < steps; i++) {
     const px = b.x, py = b.y;
     integrate(b, h);
     pathLen += Math.hypot(b.x - px, b.y - py);
+    let z = -1;
+    for (let j = 0; j < planets.length; j++) {
+      const p = planets[j];
+      if (Math.hypot(p.x - b.x, p.y - b.y) < p.r + 35) { z = j; break; }
+    }
+    if (z !== -1 && z !== zone) sling++;
+    zone = z;
     if (rec && i % 4 === 0) rec.push({ x: b.x, y: b.y });
     const d = Math.hypot(tgt.x - b.x, tgt.y - b.y);
     if (d < minDist) minDist = d;
-    if (d < tgt.r + 1.5) return { hit: true, minDist: d, t: (i + 1) * h, len: pathLen };
+    if (d < tgt.r + 1.5) return { hit: true, minDist: d, t: (i + 1) * h, len: pathLen, sling };
     if (hitsPlanet(b.x, b.y)) break;
     const ot = hitTarget(b.x, b.y);
     if (ot && ot !== tgt) break;
@@ -41,11 +49,12 @@ if (!solverModeSel.value) solverModeSel.value = 'scenic'; // stored value no lon
 solverModeSel.addEventListener('change', () => localStorage.setItem('solverMode', solverModeSel.value));
 
 const HIT_PICKERS = {
-  scenic:   hits => hits.reduce((w, c) => (c.sp < w.sp || (c.sp === w.sp && c.t > w.t)) ? c : w),
-  longest:  hits => hits.reduce((w, c) => c.len > w.len ? c : w),
-  shortest: hits => hits.reduce((w, c) => c.len < w.len ? c : w),
-  quickest: hits => hits.reduce((w, c) => c.t < w.t ? c : w),
-  random:   hits => hits[Math.floor(rand(0, hits.length))],
+  scenic:     hits => hits.reduce((w, c) => (c.sp < w.sp || (c.sp === w.sp && c.t > w.t)) ? c : w),
+  longest:    hits => hits.reduce((w, c) => c.len > w.len ? c : w),
+  shortest:   hits => hits.reduce((w, c) => c.len < w.len ? c : w),
+  quickest:   hits => hits.reduce((w, c) => c.t < w.t ? c : w),
+  slingshots: hits => hits.reduce((w, c) => (c.sling > w.sling || (c.sling === w.sling && c.sp < w.sp)) ? c : w),
+  random:     hits => hits[Math.floor(rand(0, hits.length))],
 };
 
 function startSolver(tgt) {
@@ -101,7 +110,7 @@ function runSolver(deadline) {
       const r = simulateShot(a, sp, 1 / 90, 8, s.tgt, rec);
       s.sims++;
       if (rec && rec.length > 1) pushViz(s, rec, false);
-      if (r.hit) s.hits.push({ a, sp, minDist: r.minDist, t: r.t, len: r.len });
+      if (r.hit) s.hits.push({ a, sp, minDist: r.minDist, t: r.t, len: r.len, sling: r.sling });
       if (!s.best || r.minDist < s.best.minDist) s.best = { a, sp, minDist: r.minDist };
     }
     if (s.i >= s.candidates.length) {
